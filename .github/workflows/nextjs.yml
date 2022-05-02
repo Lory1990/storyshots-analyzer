@@ -28,34 +28,24 @@ jobs:
 
         - run: yarn install
 
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     needs: download-libraries
 
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
-        with:
-          persist-credentials: false
-
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: Cache Next 💾
-        uses: actions/cache@v2
-        with:
-          path: ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.json') }}
-
       - run: yarn build
       - run: yarn export
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.0.0
-        with:
-          #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: out # The folder the action should deploy.
-          CLEAN: true # Automatically remove deleted files from the deploy branch
+  deploy:
+      needs: build
+      uses: JamesIves/github-pages-deploy-action@4.0.0
+      with:
+        #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages # The branch the action should deploy to.
+        FOLDER: out # The folder the action should deploy.
+        CLEAN: true # Automatically remove deleted files from the deploy branch
